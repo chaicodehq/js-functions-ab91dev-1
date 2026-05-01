@@ -53,22 +53,62 @@
  *   // => { name: "red-blue", r: 128, g: 0, b: 128 }
  *   // red and blue objects are UNCHANGED
  */
+function isValidColor(color) {
+  return color !== null && typeof color === "object" && "r" in color && "g" in color && "b" in color;
+}
+
+function clamp(value) {
+  return Math.min(255, Math.max(0, value));
+}
+
 export function mixColors(color1, color2) {
-  // Your code here
+  if (!isValidColor(color1) || !isValidColor(color2)) return null;
+
+  return {
+    name: `${color1.name}-${color2.name}`,
+    r: Math.round((color1.r + color2.r) / 2),
+    g: Math.round((color1.g + color2.g) / 2),
+    b: Math.round((color1.b + color2.b) / 2),
+  };
 }
 
 export function adjustBrightness(color, factor) {
-  // Your code here
+  if (!isValidColor(color) || typeof factor !== "number") return null;
+
+  return {
+    name: color.name,
+    r: clamp(Math.round(color.r * factor)),
+    g: clamp(Math.round(color.g * factor)),
+    b: clamp(Math.round(color.b * factor)),
+  };
 }
 
 export function addToPalette(palette, color) {
-  // Your code here
+  if (!isValidColor(color)) return Array.isArray(palette) ? [...palette] : [];
+  if (!Array.isArray(palette)) return [color];
+  return [...palette, color];
 }
 
 export function removeFromPalette(palette, colorName) {
-  // Your code here
+  if (!Array.isArray(palette)) return [];
+  return palette.filter(function(color) {
+    return color.name !== colorName;
+  });
 }
 
 export function mergePalettes(palette1, palette2) {
-  // Your code here
+  const first  = Array.isArray(palette1) ? palette1 : [];
+  const second = Array.isArray(palette2) ? palette2 : [];
+  const merged = [...first];
+
+  for (const color of second) {
+    const alreadyExists = merged.some(function(c) {
+      return c.name === color.name;
+    });
+    if (!alreadyExists) {
+      merged.push(color);
+    }
+  }
+
+  return merged;
 }
